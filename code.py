@@ -2,23 +2,8 @@ import asyncio
 import time
 
 import adafruit_rtttl
+import animations
 import board
-import neopixel
-from adafruit_led_animation.animation.blink import Blink
-from adafruit_led_animation.animation.chase import Chase
-from adafruit_led_animation.animation.colorcycle import ColorCycle
-from adafruit_led_animation.animation.comet import Comet
-from adafruit_led_animation.animation.customcolorchase import CustomColorChase
-from adafruit_led_animation.animation.pulse import Pulse
-from adafruit_led_animation.animation.rainbow import Rainbow
-from adafruit_led_animation.animation.rainbowchase import RainbowChase
-from adafruit_led_animation.animation.rainbowcomet import RainbowComet
-from adafruit_led_animation.animation.rainbowsparkle import RainbowSparkle
-from adafruit_led_animation.animation.solid import Solid
-from adafruit_led_animation.animation.sparkle import Sparkle
-from adafruit_led_animation.animation.sparklepulse import SparklePulse
-from adafruit_led_animation.color import AMBER, JADE, MAGENTA, ORANGE, PURPLE, WHITE
-from adafruit_led_animation.sequence import AnimationSequence
 from adafruit_macropad import MacroPad
 from digitalio import DigitalInOut, Direction
 from rainbowio import colorwheel
@@ -101,45 +86,6 @@ async def light_up_key_loop(keys_monitor):
         await asyncio.sleep(0)
 
 
-async def animate_keys(keys_monitor):
-    # pixels = neopixel.NeoPixel(board.NEOPIXEL, 12)
-    pixels = macropad.pixels
-    blink = Blink(pixels, speed=0.5, color=JADE)
-    colorcycle = ColorCycle(pixels, speed=0.4, colors=[MAGENTA, ORANGE])
-    comet = Comet(pixels, speed=0.01, color=PURPLE, tail_length=10, bounce=True)
-    chase = Chase(pixels, speed=0.1, size=3, spacing=6, color=WHITE)
-    pulse = Pulse(pixels, speed=0.1, period=3, color=AMBER)
-    sparkle = Sparkle(pixels, speed=0.1, color=PURPLE, num_sparkles=10)
-    solid = Solid(pixels, color=JADE)
-    rainbow = Rainbow(pixels, speed=0.1, period=2)
-    sparkle_pulse = SparklePulse(pixels, speed=0.1, period=3, color=JADE)
-    rainbow_comet = RainbowComet(pixels, speed=0.1, tail_length=7, bounce=True)
-    rainbow_chase = RainbowChase(pixels, speed=0.1, size=3, spacing=2, step=8)
-    rainbow_sparkle = RainbowSparkle(pixels, speed=0.1, num_sparkles=15)
-    custom_color_chase = CustomColorChase(
-        pixels, speed=0.1, size=2, spacing=3, colors=[ORANGE, WHITE, JADE]
-    )
-    animations = AnimationSequence(
-        comet,
-        blink,
-        rainbow_sparkle,
-        chase,
-        pulse,
-        sparkle,
-        rainbow,
-        solid,
-        rainbow_comet,
-        sparkle_pulse,
-        rainbow_chase,
-        custom_color_chase,
-        advance_interval=5,
-        auto_clear=True,
-    )
-    while True:
-        animations.animate()
-        await asyncio.sleep(0)
-
-
 def play_tune(key_number):
     audio_files = ["chorus_of_angels4.mp3"]
     # audio_files = ["slow.mp3", "happy.mp3", "beats.mp3", "upbeats.mp3"]
@@ -205,7 +151,7 @@ async def main():
     keys_monitor_task = asyncio.create_task(keys_monitor_loop(keys_monitor))
     # light_up_key_task = asyncio.create_task(light_up_key_loop(keys_monitor))
     play_tone_task = asyncio.create_task(play_tone_loop(keys_monitor))
-    keys_animation = asyncio.create_task(animate_keys(keys_monitor))
+    keys_animation = asyncio.create_task(animations.animate_keys(macropad.pixels))
     # play_tune_task = asyncio.create_task(play_tune(0))
     # await asyncio.gather(
     #     keys_monitor_task, play_tone_task, light_up_key_task, play_tune_task

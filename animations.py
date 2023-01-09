@@ -17,7 +17,8 @@ from adafruit_led_animation.color import AMBER, JADE, MAGENTA, ORANGE, PURPLE, W
 from adafruit_led_animation.sequence import AnimationSequence
 
 
-async def animate_keys(pixels):
+async def animate_keys(macropad, state):
+    pixels = macropad.pixels
     # pixels = neopixel.NeoPixel(board.NEOPIXEL, 12)
     blink = Blink(pixels, speed=0.5, color=JADE)
     colorcycle = ColorCycle(pixels, speed=0.4, colors=[MAGENTA, ORANGE])
@@ -51,5 +52,9 @@ async def animate_keys(pixels):
         auto_clear=True,
     )
     while True:
-        # animations.animate()
+        if state.encoder_toggled:
+            animations.animate()
+        else:
+            animations.reset()
+            animations.fill((0,0,0))
         await asyncio.sleep(0)
